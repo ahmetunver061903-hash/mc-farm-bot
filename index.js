@@ -14,7 +14,8 @@ const config = {
   host: 'oyna.CapeNW.org',
   port: 25565,
   username: 'gta2',
-  password: 'Gta2FarmBot123' // Otomatik belirlenmiş varsayılan şifre
+  password: 'Gta2FarmBot123',
+  version: '1.16.5' // Sunucu sürümünü sabitledik (Gerekirse '1.20.1' yapılabilir)
 };
 
 function createBot() {
@@ -23,7 +24,9 @@ function createBot() {
   const bot = mineflayer.createBot({
     host: config.host,
     port: config.port,
-    username: config.username
+    username: config.username,
+    version: config.version,
+    checkTimeoutInterval: 60000 // Bağlantı zaman aşımı süresini artırdık
   });
 
   bot.on('spawn', () => {
@@ -48,16 +51,20 @@ function createBot() {
       console.log('gta oyuncusuna TP isteği gönderildi.');
     }, 12000);
 
-    // Anti-AFK: Sunucudan atılmamak için her 60 saniyede bir zıplar
+    // Anti-AFK (60 saniyede bir zıplar)
     setInterval(() => {
       bot.setControlState('jump', true);
       setTimeout(() => bot.setControlState('jump', false), 500);
     }, 60000);
   });
 
-  // Sunucu sohbetini Render Logs ekranında izlemek için
+  // Sunucu sohbetini ve uyarılarını loga yazdır
   bot.on('message', (message) => {
     console.log(`[Sunucu]: ${message.toAnsi()}`);
+  });
+
+  bot.on('kicked', (reason) => {
+    console.log('Bot sunucudan atıldı (Kicked):', reason);
   });
 
   bot.on('end', (reason) => {
